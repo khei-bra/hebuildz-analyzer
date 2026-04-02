@@ -34,17 +34,17 @@
 
 <div class="main-container">
     <div style="text-align: center; margin-bottom: 20px;">
-        <h2 style="margin: 0; color: var(--hb-dark);">مساعد HeBuildz الذكي 👷‍♂️</h2>
-        <p style="color: #64748b; font-size: 12px;">تحليل فوري للمناقصات ودواتر الشروط</p>
+        <h2 style="margin: 0; color: var(--hb-dark);">مساعد HeBuildz الذكي </h2>
+        <p style="color: #64748b; font-size: 12px;">تحليل فوري للمناقصات ودفاتر الشروط</p>
     </div>
 
     <div class="mode-selector">
         <button id="btn1" class="mode-btn active" onclick="switchUI('ads')">
-            <span>📢 تحليل إعلان</span>
-            <small style="font-weight: 400;">(صورة سريعة للهاتف)</small>
+            <span> تحليل إعلان</span>
+            <small style="font-weight: 400;">(إلتقط صورة للإعلان)</small>
         </button>
         <button id="btn2" class="mode-btn" onclick="switchUI('cahier')">
-            <span>📄 دفتر الشروط</span>
+            <span> دفتر الشروط</span>
             <small style="font-weight: 400;">(تحليل معمق للفوز)</small>
         </button>
     </div>
@@ -58,7 +58,7 @@
 
     <button id="mainBtn" class="action-btn" onclick="processAnalysis()">
         <span class="loader" id="ld"></span>
-        <span id="btnTxt">بدء التحليل الاستراتيجي ⚡</span>
+        <span id="btnTxt">بدء التحليل الاستراتيجي </span>
     </button>
 
     <div id="report-output">
@@ -141,7 +141,7 @@
             } finally {
                 btn.disabled = false;
                 loader.style.display = 'none';
-                txt.innerText = "بدء التحليل الاستراتيجي ⚡";
+                txt.innerText = "بدء التحليل الاستراتيجي ";
             }
         };
         reader.readAsDataURL(file);
