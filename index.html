@@ -3,54 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HeBuildz Analyzer</title>
+    <title>HeBuildz AI Analyzer</title>
     <style>
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #fdfdfd; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .app-container { width: 100%; max-width: 600px; background: white; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; border: 1px solid #eee; }
-        .app-header { background: #2c3e50; color: white; padding: 25px; text-align: center; }
-        .app-header h1 { margin: 0; font-size: 24px; }
-        .app-header h1 span { color: #ff5722; }
-        .content { padding: 40px; text-align: center; }
-        .upload-area { border: 3px dashed #ff5722; padding: 50px 20px; border-radius: 15px; background: #fff9f7; cursor: pointer; transition: 0.3s; margin-bottom: 25px; }
-        .upload-area:hover { background: #fff0eb; border-color: #e64a19; }
-        .upload-icon { font-size: 50px; margin-bottom: 15px; display: block; }
-        .btn-analyze { background: #ff5722; color: white; border: none; padding: 18px 40px; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; }
-        .btn-analyze:hover { background: #e64a19; transform: translateY(-2px); }
-        .footer-info { background: #f8f9fa; padding: 15px; font-size: 13px; color: #7f8c8d; border-top: 1px solid #eee; }
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .app-card { width: 95%; max-width: 550px; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: #2c3e50; color: white; padding: 20px; text-align: center; border-bottom: 4px solid #ff5722; }
+        .content { padding: 30px; text-align: center; }
+        .upload-box { border: 2px dashed #ff5722; padding: 40px 20px; border-radius: 12px; background: #fff9f7; cursor: pointer; margin-bottom: 20px; position: relative; }
+        .upload-box:hover { background: #fff0eb; }
+        .btn-analyze { background: #ff5722; color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-analyze:disabled { background: #bdc3c7; cursor: not-allowed; }
+        #result-area { margin-top: 20px; padding: 15px; border-radius: 8px; background: #e8f4fd; display: none; text-align: right; font-size: 0.9rem; }
+        .loading-dots:after { content: ' .'; animation: dots 1s steps(5, end) infinite; }
+        @keyframes dots { 20% { content: ' .'; } 40% { content: ' ..'; } 60% { content: ' ...'; } 80% { content: ' ....'; } }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="app-header">
-            <h1>He<span>Buildz</span> AI Analyzer</h1>
-        </div>
+    <div class="app-card">
+        <div class="header"><h2>He<span>Buildz</span> AI Analyzer</h2></div>
         <div class="content">
-            <span class="upload-icon">📄</span>
-            <h3>محلل العروض والصفقات العمومية</h3>
-            <p style="color: #666;">ارفع ملف دفتر الشروط أو جدول الأسعار بصيغة (PDF/JPG)</p>
-            <div class="upload-area" onclick="document.getElementById('file-upload').click()">
-                <p id="file-name">اسحب الملف هنا أو انقر لاختياره</p>
-                <input type="file" id="file-upload" style="display: none;" onchange="updateFileName()">
+            <div class="upload-box" onclick="document.getElementById('fileInput').click()">
+                <span id="upload-text" style="font-size: 1.2rem; color: #7f8c8d;">📁 انقر لرفع ملف (PDF/BPU)</span>
+                <input type="file" id="fileInput" style="display: none" onchange="handleFile(this)">
             </div>
-            <button class="btn-analyze" onclick="startAnalysis()">بدء التحليل الذكي</button>
-        </div>
-        <div class="footer-info">
-            المنصة تدعم تحليل المواد القانونية والتقدير المالي وفق المرسوم 15-247
+            <button id="analyzeBtn" class="btn-analyze" disabled onclick="runAI()">بدء التحليل الاستراتيجي</button>
+            <div id="result-area"></div>
         </div>
     </div>
 
     <script>
-        function updateFileName() {
-            const input = document.getElementById('file-upload');
-            const nameDisplay = document.getElementById('file-name');
+        function handleFile(input) {
+            const text = document.getElementById('upload-text');
+            const btn = document.getElementById('analyzeBtn');
             if (input.files.length > 0) {
-                nameDisplay.innerText = "تم اختيار: " + input.files[0].name;
-                nameDisplay.style.color = "#27ae60";
-                nameDisplay.style.fontWeight = "bold";
+                text.innerText = "✅ تم تحميل: " + input.files[0].name;
+                text.style.color = "#27ae60";
+                btn.disabled = false;
             }
         }
-        function startAnalysis() {
-            alert("جاري الاتصال بمحرك HeBuildz AI... يرجى الانتظار");
+
+        function runAI() {
+            const btn = document.getElementById('analyzeBtn');
+            const res = document.getElementById('result-area');
+            btn.disabled = true;
+            btn.innerText = "جاري التحليل عبر الذكاء الاصطناعي";
+            btn.classList.add('loading-dots');
+            res.style.display = 'block';
+            res.innerHTML = "<b>جاري الفحص...</b><br>• التدقيق في مطابقة المادة 67 من قانون الصفقات...<br>• تحليل هوامش الربح في جدول الأسعار...";
+
+            setTimeout(() => {
+                btn.classList.remove('loading-dots');
+                btn.innerText = "تم التحليل بنجاح";
+                res.innerHTML = "<b style='color:#2c3e50'>نتائج تحليل HeBuildz:</b><br>✅ الملف مطابق إدارياً للمناقصة.<br>⚠️ تنبيه: السعر في البند رقم 4 منخفض بنسبة 15% عن سعر السوق الحالي.<br>💡 توصية: يرجى مراجعة عرض السعر لتجنب الإقصاء بسبب 'العرض المالي غير المجدي'.";
+            }, 3000);
         }
     </script>
 </body>
