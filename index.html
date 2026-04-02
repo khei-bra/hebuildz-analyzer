@@ -3,145 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HeBuildz AI Professional</title>
+    <title>HeBuildz AI</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
-        :root { --hb-dark: #1e293b; --hb-orange: #f59e0b; --hb-success: #22c55e; }
-        body { font-family: 'Cairo', sans-serif; background: #f8fafc; margin: 0; padding: 15px; }
-        .main-container { max-width: 600px; margin: auto; background: white; border-radius: 25px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
-        
-        .mode-selector { display: flex; gap: 10px; margin-bottom: 25px; background: #f1f5f9; padding: 6px; border-radius: 15px; }
-        .mode-btn { flex: 1; padding: 15px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.3s; font-family: 'Cairo'; font-size: 14px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .mode-btn.active { background: var(--hb-dark); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .mode-btn i { font-size: 20px; }
-
-        .upload-section { border: 2px dashed #cbd5e1; border-radius: 20px; padding: 40px 20px; text-align: center; margin-bottom: 25px; cursor: pointer; background: #fafafa; }
-        .upload-section:hover { border-color: var(--hb-orange); background: #fffcf5; }
-        
-        .action-btn { width: 100%; padding: 18px; background: var(--hb-dark); color: white; border: none; border-radius: 15px; font-size: 18px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; transition: 0.3s; }
-        .action-btn:disabled { background: #94a3b8; cursor: not-allowed; }
-
-        #report-output { display: none; margin-top: 30px; animation: fadeIn 0.6s ease; }
-        .report-card { padding: 20px; border-radius: 15px; border-right: 6px solid var(--hb-orange); background: #fffcf5; line-height: 1.8; font-size: 14px; }
-        .decision-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; font-weight: bold; margin-bottom: 15px; }
-        
-        .loader { width: 22px; height: 22px; border: 3px solid #ffffff3d; border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; display: none; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        body { font-family: 'Cairo', sans-serif; background: #f8fafc; padding: 15px; margin: 0; }
+        .card { max-width: 500px; margin: auto; background: white; border-radius: 20px; padding: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); border: 1px solid #eee; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; background: #f1f5f9; padding: 5px; border-radius: 12px; }
+        .tab { flex: 1; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; background: transparent; color: #64748b; font-family: 'Cairo'; }
+        .tab.active { background: #1e293b; color: white; }
+        .upload-zone { border: 2px dashed #f59e0b; background: #fffcf5; padding: 30px; text-align: center; border-radius: 15px; cursor: pointer; margin-bottom: 20px; }
+        .btn { width: 100%; padding: 15px; background: #1e293b; color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; }
+        #res { display: none; margin-top: 20px; padding: 15px; background: #f0fdf4; border-right: 5px solid #22c55e; border-radius: 8px; font-size: 14px; line-height: 1.6; }
     </style>
 </head>
 <body>
 
-<div class="main-container">
-    <div style="text-align: center; margin-bottom: 20px;">
-        <h2 style="margin: 0; color: var(--hb-dark);">مساعد HeBuildz الذكي </h2>
-        <p style="color: #64748b; font-size: 12px;">تحليل فوري للمناقصات ودفاتر الشروط</p>
+<div class="card">
+    <div class="tabs">
+        <button id="b1" class="tab active" onclick="sel(1)">📢 تصوير إعلان</button>
+        <button id="b2" class="tab" onclick="sel(2)">📄 دفتر شروط</button>
     </div>
 
-    <div class="mode-selector">
-        <button id="btn1" class="mode-btn active" onclick="switchUI('ads')">
-            <span> تحليل إعلان</span>
-            <small style="font-weight: 400;">(إلتقط صورة للإعلان)</small>
-        </button>
-        <button id="btn2" class="mode-btn" onclick="switchUI('cahier')">
-            <span> دفتر الشروط</span>
-            <small style="font-weight: 400;">(تحليل معمق للفوز)</small>
-        </button>
+    <div class="upload-zone" onclick="document.getElementById('f').click()">
+        <input type="file" id="f" style="display:none" accept="image/*,application/pdf" capture="environment">
+        <div id="txt">اضغط للتصوير أو الرفع</div>
     </div>
 
-    <div class="upload-section" onclick="document.getElementById('fileIn').click()">
-        <input type="file" id="fileIn" style="display:none" accept="image/*,application/pdf" capture="environment">
-        <div id="icon-box" style="font-size: 45px;">📸</div>
-        <div id="file-status" style="font-weight: bold; margin-top: 10px; color: var(--hb-dark);">اضغط للتصوير أو رفع الملف</div>
-        <div style="font-size: 11px; color: #94a3b8; margin-top: 5px;">يدعم الصور المباشرة و ملفات الـ PDF</div>
-    </div>
+    <button id="run" class="btn" onclick="go()">بدء التحليل الفوري ⚡</button>
 
-    <button id="mainBtn" class="action-btn" onclick="processAnalysis()">
-        <span class="loader" id="ld"></span>
-        <span id="btnTxt">بدء التحليل الاستراتيجي </span>
-    </button>
-
-    <div id="report-output">
-        <div class="report-card">
-            <div id="decision-area"></div>
-            <div id="ai-content"></div>
-        </div>
-    </div>
+    <div id="res"></div>
 </div>
 
 <script>
-    let currentMode = 'ads';
-    const fileIn = document.getElementById('fileIn');
-    
-    fileIn.onchange = () => {
-        if(fileIn.files[0]) {
-            document.getElementById('file-status').innerText = "✅ تم التقاط الوثيقة بنجاح";
-            document.getElementById('icon-box').innerText = "✔️";
-        }
-    };
-
-    function switchUI(mode) {
-        currentMode = mode;
-        document.getElementById('btn1').className = mode === 'ads' ? 'mode-btn active' : 'mode-btn';
-        document.getElementById('btn2').className = mode === 'cahier' ? 'mode-btn active' : 'mode-btn';
-        document.getElementById('report-output').style.display = 'none';
-        document.getElementById('icon-box').innerText = mode === 'ads' ? '📸' : '📁';
+    let mode = 1;
+    function sel(n) {
+        mode = n;
+        document.getElementById('b1').className = n==1 ? 'tab active' : 'tab';
+        document.getElementById('b2').className = n==2 ? 'tab active' : 'tab';
     }
 
-    async function processAnalysis() {
-        const file = fileIn.files[0];
-        if(!file) return alert("يرجى تصوير الوثيقة أو رفع الملف أولاً");
+    async function go() {
+        const file = document.getElementById('f').files[0];
+        if(!file) return alert("يرجى اختيار ملف أولاً");
 
-        const btn = document.getElementById('mainBtn');
-        const loader = document.getElementById('ld');
-        const txt = document.getElementById('btnTxt');
+        const btn = document.getElementById('run');
+        const resDiv = document.getElementById('res');
         
+        btn.innerText = "جاري التحليل... انتظر ثواني";
         btn.disabled = true;
-        loader.style.display = 'inline-block';
-        txt.innerText = "جاري التحليل المعمق...";
 
         const reader = new FileReader();
         reader.onloadend = async () => {
             const base64 = reader.result.split(',')[1];
-            const API_KEY = "AIzaSyBHlb39mDzSBvwc4u_uCfTUbYKfL1Bb2TQ"; // مفتاحك الفعال
+            const KEY = "AIzaSyBHlb39mDzSBvwc4u_uCfTUbYKfL1Bb2TQ"; // مفتاحك الفعال
             
-            // تخصيص الأوامر (Prompts) بناءً على طلبك
-            const prompt = currentMode === 'ads' 
-                ? "حلل إعلان المناقصة هذا بدقة. أخبر المقاول بوضوح في البداية: 'نعم قدم' أو 'لا تقدم'. ثم اشرح الأسباب بناءً على: طبيعة المشروع، التصنيف المطلوب، والآجال. كن مختصراً وحاسماً."
-                : "أنت خبير صفقات عمومية جزائري. حلل دفتر الشروط هذا بالكامل. استخرج: 1. الشروط التعجيزية 2. الأوراق التقنية المطلوبة بدقة 3. نصائح سرية للفوز بالمناقصة وتجنب الإقصاء. قدم تقريراً طويلاً ومفصلاً.";
+            const prompt = mode == 1 
+                ? "حلل هذا الإعلان: هل يشارك المقاول؟ ابدأ بـ (نعم قدم) أو (لا تقدم) ثم اشرح بالدارجة الجزائرية." 
+                : "حلل دفتر الشروط هذا بعمق لغرض الفوز بالمناقصة وتجنب الإقصاء.";
 
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${KEY}`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        contents: [{ parts: [
-                            { text: prompt },
-                            { inline_data: { mime_type: file.type, data: base64 } }
-                        ]}]
+                        contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: file.type, data: base64 } }] }]
                     })
                 });
 
                 const data = await response.json();
-                const resultText = data.candidates[0].content.parts[0].text;
-                
-                // عرض النتيجة
-                document.getElementById('ai-content').innerText = resultText;
-                document.getElementById('report-output').style.display = 'block';
-                
-                if(currentMode === 'ads') {
-                    const isGo = resultText.includes("نعم") || resultText.includes("قدم");
-                    document.getElementById('decision-area').innerHTML = `<span class="decision-badge" style="background:${isGo?'#dcfce7':'#fee2e2'}; color:${isGo?'#166534':'#991b1b'}">${isGo?'🚀 قرار HeBuildz: قدم للمنافسة':'⚠️ قرار HeBuildz: لا تقدم'}</span>`;
-                } else {
-                    document.getElementById('decision-area').innerHTML = `<span class="decision-badge" style="background:#dbeafe; color:#1e40af">📋 خطة الفوز بالمناقصة (تقرير شامل)</span>`;
-                }
-
-            } catch (err) {
-                alert("حدث خطأ في الاتصال. تأكد من جودة الصورة.");
+                resDiv.innerText = data.candidates[0].content.parts[0].text;
+                resDiv.style.display = 'block';
+            } catch (e) {
+                alert("خطأ في الاتصال، تأكد من وضوح الصورة");
             } finally {
+                btn.innerText = "بدء التحليل الفوري ⚡";
                 btn.disabled = false;
-                loader.style.display = 'none';
-                txt.innerText = "بدء التحليل الاستراتيجي ";
             }
         };
         reader.readAsDataURL(file);
