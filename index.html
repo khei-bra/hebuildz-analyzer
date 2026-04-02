@@ -27,27 +27,27 @@
             const [file, setFile] = useState(null);
             const [loading, setLoading] = useState(false);
             const [result, setResult] = useState("");
+            const [error, setError] = useState("");
 
-            // تفعيل الأيقونات
             useEffect(() => {
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
-            }, [activeTab, loading, result]);
+                if (window.lucide) window.lucide.createIcons();
+            }, [activeTab, loading, result, error]);
 
             const handleFileChange = (e) => {
                 const selectedFile = e.target.files[0];
-                if (selectedFile) setFile(selectedFile);
+                if (selectedFile) {
+                    setFile(selectedFile);
+                    setResult("");
+                    setError("");
+                }
             };
 
             const runAnalysis = async () => {
-                if (!file) {
-                    alert("الرجاء رفع ملف أولاً");
-                    return;
-                }
+                if (!file) return;
                 
                 setLoading(true);
                 setResult("");
+                setError("");
 
                 const reader = new FileReader();
                 reader.onloadend = async () => {
@@ -61,7 +61,7 @@
                             body: JSON.stringify({
                                 contents: [{
                                     parts: [
-                                        { text: activeTab === 'consultation' ? "حلل إعلان هذه المناقصة الجزائرية واستخرج: طبيعة المشروع، مدة الإنجاز، والوثائق المطلوبة." : "حلل جدول الأسعار الوحدوية (BPU) لهذا المشروع وحذرني من أي أسعار غير منطقية." },
+                                        { text: activeTab === 'consultation' ? "حلل هذه الوثيقة واستخرج طبيعة المشروع والوثائق المطلوبة." : "حلل دفتر الشروط واستخرج الالتزامات المالية." },
                                         { inline_data: { mime_type: file.type, data: base64Data } }
                                     ]
                                 }]
@@ -69,42 +69,81 @@
                         });
 
                         const data = await response.json();
-                        if (data.candidates && data.candidates[0]) {
+                        
+                        // فحص دقيق للاستجابة لمنع الـ Crash
+                        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
                             setResult(data.candidates[0].content.parts[0].text);
+                        } else if (data.error) {
+                            setError(`خطأ من المحرك: ${data.error.message}`);
                         } else {
-                            setResult("تعذر الحصول على تحليل. تأكد من وضوح الملف.");
+                            setError("لم يتمكن الذكاء الاصطناعي من قراءة الملف. حاول رفع صورة أوضح.");
                         }
-                    } catch (error) {
-                        setResult("خطأ في الاتصال بالمحرك الذكي. حاول مجدداً.");
+                    } catch (err) {
+                        setError("حدث خطأ أثناء الاتصال بالخادم. تأكد من الإنترنت.");
                     } finally {
                         setLoading(false);
                     }
                 };
+                
+                reader.onerror = () => {
+                    setError("فشل قراءة الملف من جهازك.");
+                    setLoading(false);
+                };
+
                 reader.readAsDataURL(file);
             };
 
             return (
-                <div className="min-h-screen p-4 md:p-8">
-                    <div className="max-w-4xl mx-auto">
-                        {/* نظام التبويبات */}
+                <div className="min-h-screen p-4">
+                    <div className="max-w-3xl mx-auto">
                         <div className="flex gap-2 p-1 bg-slate-200 rounded-xl w-fit mb-8 mx-auto shadow-sm">
-                            <button 
-                                onClick={() => {setActiveTab('consultation'); setResult(""); setFile(null);}}
-                                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all ${activeTab === 'consultation' ? 'bg-[#1e293b] text-white shadow-md' : 'text-slate-600 hover:bg-slate-300'}`}
-                            >
-                                <i data-lucide="file-text" className="w-5 h-5"></i>
-                                تدقيق الاستشارة
+                            <button onClick={() => setActiveTab('consultation')}
+                                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all ${activeTab === 'consultation' ? 'bg-[#1e293b] text-white' : 'text-slate-600'}`}>
+                                <i data-lucide="file-text"></i> تدقيق الاستشارة
                             </button>
-                            <button 
-                                onClick={() => {setActiveTab('cahier'); setResult(""); setFile(null);}}
-                                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all ${activeTab === 'cahier' ? 'bg-[#f59e0b] text-white shadow-md' : 'text-slate-600 hover:bg-slate-300'}`}
-                            >
-                                <i data-lucide="shield" className="w-5 h-5"></i>
-                                تحليل دفتر الشروط
+                            <button onClick={() => setActiveTab('cahier')}
+                                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all ${activeTab === 'cahier' ? 'bg-[#f59e0b] text-white' : 'text-slate-600'}`}>
+                                <i data-lucide="shield"></i> تحليل دفتر الشروط
                             </button>
                         </div>
 
-                        {/* البطاقة الرئيسية */}
-                        <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 md:p-10">
-                            <h2 className="text-2xl font-bold text-slate-800 mb-2 text-center">
-                                {activeTab === 'consultation' ? 'محلل الاستشارات الذكي' : 'مدقق
+                        <div className="bg-white rounded-2xl shadow-xl border p-8">
+                            <h2 className="text-2xl font-bold text-center mb-6">
+                                {activeTab === 'consultation' ? 'محلل الاستشارات' : 'مدقق دفاتر الشروط'}
+                            </h2>
+                            
+                            <div className="border-2 border-dashed border-slate-200 rounded-xl p-10 hover:border-orange-400 bg-slate-50 text-center relative mb-6">
+                                <input type="file" onChange={handleFileChange} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*,application/pdf" />
+                                <i data-lucide="upload-cloud" className="mx-auto mb-2 text-slate-400"></i>
+                                <p className="font-bold text-slate-700">{file ? file.name : "اضغط لرفع وثيقة (صورة أو PDF)"}</p>
+                            </div>
+
+                            <button onClick={runAnalysis} disabled={loading || !file}
+                                className={`w-full py-4 rounded-xl font-bold text-lg flex justify-center items-center gap-3 transition-all ${loading || !file ? 'bg-slate-300' : 'bg-[#2c3e50] text-white hover:bg-[#1a252f]'}`}>
+                                {loading ? <div className="loader"></div> : <i data-lucide="zap" className="text-yellow-400"></i>}
+                                {loading ? "جاري التحليل..." : "بدء التحليل الآن"}
+                            </button>
+
+                            {error && (
+                                <div className="mt-6 p-4 bg-red-50 border-r-4 border-red-500 text-red-700 text-sm">
+                                    {error}
+                                </div>
+                            )}
+
+                            {result && (
+                                <div className="mt-8 p-6 bg-orange-50 border-r-4 border-orange-500 rounded-lg text-right">
+                                    <p className="font-bold text-orange-800 mb-2">تقرير التحليل:</p>
+                                    <div className="text-slate-700 whitespace-pre-wrap leading-relaxed">{result}</div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
