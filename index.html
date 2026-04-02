@@ -3,79 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HeBuildz - AI Smart Analyzer</title>
-    <style>
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .app-card { width: 95%; max-width: 550px; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; border: 1px solid #ddd; }
-        .header { background: #2c3e50; color: white; padding: 20px; text-align: center; border-bottom: 5px solid #ff5722; }
-        .content { padding: 30px; }
-        .upload-box { border: 2px dashed #ff5722; padding: 40px; border-radius: 12px; background: #fff9f7; cursor: pointer; text-align: center; margin-bottom: 20px; }
-        .btn-analyze { background: #ff5722; color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-analyze:disabled { background: #bdc3c7; cursor: not-allowed; }
-        
-        /* منطقة النتائج */
-        #analysis-result { margin-top: 20px; display: none; padding: 20px; border-radius: 10px; background: #f8f9fa; border-right: 5px solid #27ae60; animation: fadeIn 0.5s; }
-        .progress-bar { height: 10px; background: #eee; border-radius: 5px; margin: 15px 0; display: none; overflow: hidden; }
-        .progress-fill { height: 100%; background: #ff5722; width: 0%; transition: width 3s linear; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+    <title>HeBuildz AI Studio Prototype</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-    <div class="app-card">
-        <div class="header"><h2>He<span>Buildz</span> AI</h2></div>
-        <div class="content">
-            <div class="upload-box" id="dropZone" onclick="document.getElementById('fileInput').click()">
-                <span id="status-text" style="font-size: 1.1rem; color: #7f8c8d;">📂 انقر لرفع ملف المناقصة (BPU/PDF)</span>
-                <input type="file" id="fileInput" style="display: none" onchange="fileSelected(this)">
-            </div>
+    <div id="root"></div>
 
-            <button id="startBtn" class="btn-analyze" disabled onclick="simulateAnalysis()">بدء التحليل الاستراتيجي</button>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-            <div class="progress-bar" id="pBar"><div class="progress-fill" id="pFill"></div></div>
-
-            <div id="analysis-result">
-                <h4 style="margin:0 0 10px 0; color: #2c3e50;">📊 نتائج تقرير HeBuildz:</h4>
-                <p id="result-text" style="line-height: 1.6; font-size: 0.95rem; color: #444;"></p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        function fileSelected(input) {
-            if (input.files.length > 0) {
-                document.getElementById('status-text').innerHTML = "✅ تم تحميل: <b>" + input.files[0].name + "</b>";
-                document.getElementById('status-text').style.color = "#27ae60";
-                document.getElementById('startBtn').disabled = false;
-            }
-        }
-
-        function simulateAnalysis() {
-            const btn = document.getElementById('startBtn');
-            const pBar = document.getElementById('pBar');
-            const pFill = document.getElementById('pFill');
-            const result = document.getElementById('analysis-result');
-            const resText = document.getElementById('result-text');
-
-            btn.disabled = true;
-            btn.innerText = "جاري الفحص المتقدم...";
-            pBar.style.display = 'block';
+        function App() {
+            // انسخ هنا المنطق (Logic) الخاص بـ App.tsx الذي ولده لك Google AI Studio
+            // سأضع لك مثالاً للهيكل الذي يولده AI Studio عادةً:
             
-            // تحريك شريط التقدم
-            setTimeout(() => { pFill.style.width = '100%'; }, 100);
+            const [loading, setLoading] = useState(false);
+            const [result, setResult] = useState(null);
 
-            // إظهار النتيجة بعد 3 ثوانٍ
-            setTimeout(() => {
-                pBar.style.display = 'none';
-                btn.innerText = "اكتمل التحليل ✅";
-                result.style.display = 'block';
-                resText.innerHTML = `
-                    • <b>الأهلية القانونية:</b> الملف مطابق للمرسوم 15-247.<br>
-                    • <b>التقدير المالي:</b> تم رصد مخاطر في "البند 04" (أشغال الحفر) - السعر أقل من المعدل الوطني بـ 12%.<br>
-                    • <b>التوصية:</b> يوصى برفع السعر الوحدوي لتجنب إقصاء العرض كـ "عرض غير مجدي".
-                `;
-            }, 3200);
+            const handleAnalyze = () => {
+                setLoading(true);
+                // هنا يتم استدعاء Gemini API (تأكد من وضع API Key الخاص بك)
+                setTimeout(() => {
+                    setResult("نتائج التحليل من Gemini API...");
+                    setLoading(false);
+                }, 2000);
+            };
+
+            return (
+                <div className="p-8 bg-gray-50 min-h-screen">
+                    <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
+                        <h1 className="text-2xl font-bold text-gray-800 mb-4">HeBuildz - AI Studio Engine</h1>
+                        <p className="text-gray-600 mb-6">هذا النموذج يعمل بمحرك Gemini 1.5 Pro</p>
+                        
+                        <div className="border-2 border-dashed border-orange-500 p-10 text-center rounded-lg cursor-pointer hover:bg-orange-50">
+                             اسحب ملف المناقصة هنا
+                        </div>
+                        
+                        <button 
+                            onClick={handleAnalyze}
+                            className="w-full mt-6 bg-orange-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-700"
+                        >
+                            {loading ? 'جاري التحليل...' : 'بدء التحليل الذكي'}
+                        </button>
+
+                        {result && (
+                            <div className="mt-6 p-4 bg-blue-50 border-r-4 border-blue-500 text-right">
+                                {result}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
         }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
