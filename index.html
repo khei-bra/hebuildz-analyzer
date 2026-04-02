@@ -3,31 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HeBuildz Core Engine</title>
+    <title>HeBuildz AI Analyzer - Core</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+        body { font-family: 'Cairo', sans-serif; background-color: transparent; }
+    </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        // 1. هنا نضع محتويات ملف App.tsx الذي نسخه من AI Studio
-        // (تأكد من إزالة سطر import React و Lucide لأننا حملناها أعلاه)
-        
-        const App = () => {
-            // انسخ المنطق (Logic) والـ HTML الخاص بـ App هنا
+        const { useState } = React;
+        const { FileCheck, ShieldCheck, Upload, AlertCircle } = lucide;
+
+        // الواجهة الرئيسية كما صممتها في Google AI Studio
+        function App() {
+            const [activeTab, setActiveTab] = useState('consultation');
+
             return (
-                <div className="min-h-screen bg-slate-50 p-4">
-                    {/* كود الواجهة الخاص بك هنا */}
+                <div className="min-h-screen p-4" dir="rtl">
+                    <div className="max-w-4xl mx-auto">
+                        {/* نظام التبويبات (Tabs) الأصلي الخاص بك */}
+                        <div className="flex gap-2 p-1 bg-slate-200 rounded-xl w-fit mb-8 mx-auto shadow-sm">
+                            <button
+                                onClick={() => setActiveTab('consultation')}
+                                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all ${
+                                    activeTab === 'consultation' ? 'bg-[#1e293b] text-white shadow-md' : 'text-slate-600'
+                                }`}
+                            >
+                                <i data-lucide="file-check"></i> تدقيق إعلان الاستشارة
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('cahier')}
+                                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all ${
+                                    activeTab === 'cahier' ? 'bg-[#f59e0b] text-white shadow-md' : 'text-slate-600'
+                                }`}
+                            >
+                                <i data-lucide="shield-check"></i> تحليل دفتر الشروط
+                            </button>
+                        </div>
+
+                        {/* منطقة المحتوى التفاعلية */}
+                        <div className="bg-white rounded-2xl shadow-xl border border-slate-100 p-8 text-center animate-in fade-in duration-700">
+                            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-slate-300">
+                                <i data-lucide="upload" className="text-slate-400"></i>
+                            </div>
+                            <h2 className="text-2xl font-bold text-slate-800 mb-2">
+                                {activeTab === 'consultation' ? 'محلل إعلانات الاستشارة الذكي' : 'مدقق دفاتر الشروط المتقدم'}
+                            </h2>
+                            <p className="text-slate-500 mb-8">ارفع الملف (PDF/Image) لبدء التحليل بمحرك Gemini 1.5 Pro</p>
+                            
+                            <div className="border-2 border-dashed border-slate-200 rounded-xl p-12 hover:border-orange-400 transition-colors cursor-pointer bg-slate-50">
+                                <p className="text-slate-400">اسحب الملفات هنا أو اضغط للاختيار</p>
+                            </div>
+
+                            <button className="w-full mt-6 bg-[#2c3e50] text-white py-4 rounded-xl font-bold text-lg hover:bg-[#1a252f] transition-all">
+                                بدء التحليل الاستراتيجي
+                            </button>
+                        </div>
+                    </div>
                 </div>
             );
-        };
+        }
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
+        
+        // تفعيل الأيقونات بعد رندر الصفحة
+        setTimeout(() => lucide.createIcons(), 100);
     </script>
 </body>
 </html>
