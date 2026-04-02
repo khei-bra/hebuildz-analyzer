@@ -4,81 +4,75 @@
     <meta charset="UTF-8">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
-        body { font-family: 'Cairo', sans-serif; background: transparent; padding: 10px; }
-        .hb-card { background: #fff; border-radius: 20px; padding: 20px; border: 1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .hb-tabs { display: flex; background: #f1f5f9; border-radius: 12px; padding: 5px; margin-bottom: 20px; }
-        .hb-tab { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: #64748b; background: transparent; font-family: 'Cairo'; }
+        body { font-family: 'Cairo', sans-serif; direction: rtl; padding: 20px; background: transparent; }
+        .hb-container { background: white; border-radius: 15px; padding: 25px; border: 1px solid #e2e8f0; box-shadow: 0 5px 15px rgba(0,0,0,0.05); max-width: 550px; margin: auto; }
+        .hb-tabs { display: flex; gap: 5px; background: #f1f5f9; padding: 5px; border-radius: 10px; margin-bottom: 20px; }
+        .hb-tab { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: #64748b; background: transparent; }
         .hb-tab.active { background: #1e293b; color: white; }
-        .hb-upload { border: 2px dashed #f59e0b; background: #fffcf5; padding: 30px; text-align: center; border-radius: 15px; cursor: pointer; margin-bottom: 20px; }
-        .hb-btn { width: 100%; padding: 15px; background: #1e293b; color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .hb-btn:disabled { background: #94a3b8; }
-        .spinner { width: 18px; height: 18px; border: 3px solid #ffffff3d; border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; display: none; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        #hb-result { display: none; margin-top: 20px; padding: 15px; background: #f0fdf4; border-right: 5px solid #22c55e; border-radius: 8px; animation: slideUp 0.5s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .hb-upload-box { border: 2px dashed #f59e0b; background: #fffcf5; padding: 30px; text-align: center; border-radius: 12px; margin-bottom: 20px; cursor: pointer; }
+        .hb-button { width: 100%; padding: 15px; background: #1e293b; color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 17px; cursor: pointer; }
+        
+        /* التقرير مخفي افتراضياً */
+        #analysis-result { display: none; margin-top: 20px; padding: 15px; background: #f0fdf4; border-right: 5px solid #22c55e; border-radius: 8px; border: 1px solid #dcfce7; }
+        #loading-text { display: none; text-align: center; color: #f59e0b; font-weight: bold; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<div class="hb-card">
+<div class="hb-container">
     <div class="hb-tabs">
-        <button id="tab1" class="hb-tab active" onclick="chMode(1)">تدقيق الاستشارة</button>
-        <button id="tab2" class="hb-tab" onclick="chMode(2)">تحليل دفتر الشروط</button>
+        <button class="hb-tab active">تدقيق الاستشارة</button>
+        <button class="hb-tab">تحليل دفتر الشروط</button>
     </div>
 
-    <div class="hb-upload" onclick="document.getElementById('f').click()">
-        <input type="file" id="f" style="display:none">
-        <div style="font-size: 30px;">📄</div>
-        <div id="ft" style="font-weight: bold; color: #1e293b;">{اسم الملف سيظهر هنا}</div>
-        <div style="font-size: 11px; color: #64748b;">نظام HeBuildz جاهز للتحليل الاستراتيجي</div>
+    <div class="hb-upload-box" onclick="document.getElementById('file-input').click()">
+        <input type="file" id="file-input" style="display:none" onchange="showFileName()">
+        <div style="font-size: 40px;">📄</div>
+        <div id="file-name-display" style="font-weight: bold; color: #1e293b; margin-top: 10px;">ارفع دفتر الشروط (PDF)</div>
     </div>
 
-    <button id="b" class="hb-btn" onclick="startDemo()">
-        <span class="spinner" id="s"></span>
-        <span id="bt">بدء التحليل الاستراتيجي ⚡</span>
-    </button>
+    <div id="loading-text">جاري تحليل الوثيقة ذكياً...</div>
+    
+    <button id="action-btn" class="hb-button" onclick="runFakeAnalysis()">بدء التحليل الاستراتيجي ⚡</button>
 
-    <div id="hb-result">
-        <h4 style="margin: 0 0 10px 0; color: #166534;">✅ تم استخراج التقرير الذكي:</h4>
-        <div style="font-size: 13px; line-height: 1.6; color: #1e293b;">
-            <b>• الوثيقة:</b> دفتر شروط اقتناء العجلات والبطاريات.<br>
-            <b>• التحليل التقني:</b> المواصفات المطلوبة مطابقة للمعايير الوطنية (الجزائر).<br>
-            <b>• ملاحظة هامة:</b> البند رقم 07 يفرض آجال تسليم قصيرة جداً (15 يوماً)، ينصح بمراجعة قدرة المخزون قبل التعهد.<br>
-            <b>• التقييم القانوني:</b> الوثيقة سليمة وتتوافق مع قانون الصفقات العمومية الحالي.
+    <div id="analysis-result">
+        <h4 style="margin: 0 0 10px 0; color: #166534;">✅ تم التحليل الاستراتيجي بنجاح:</h4>
+        <div style="font-size: 14px; line-height: 1.6; color: #1e293b;">
+            <b>• ملخص المشروع:</b> اقتناء لوازم وقطع غيار (عجلات وبطاريات).<br>
+            <b>• الثغرات المكتشفة:</b> يوجد تضارب في المادة 07 بين مدة التسليم وطريقة الدفع.<br>
+            <b>• التوصية القانونية:</b> الوثيقة تتوافق بنسبة 90% مع قانون الصفقات العمومية الجزائري.<br>
+            <b>• نصيحة HeBuildz:</b> تأكد من إرفاق شهادة الحالة الجبائية (Extrait de rôle) محينة.
         </div>
     </div>
 </div>
 
 <script>
-    const f = document.getElementById('f');
-    const ft = document.getElementById('ft');
-    f.onchange = () => { if(f.files[0]) ft.innerText = "✅ " + f.files[0].name; };
-
-    function chMode(n) {
-        document.getElementById('tab1').className = n===1 ? 'hb-tab active' : 'hb-tab';
-        document.getElementById('tab2').className = n===2 ? 'hb-tab active' : 'hb-tab';
+    function showFileName() {
+        const input = document.getElementById('file-input');
+        if(input.files[0]) {
+            document.getElementById('file-name-display').innerText = "✅ " + input.files[0].name;
+        }
     }
 
-    function startDemo() {
-        if(!f.files[0]) return alert("يرجى رفع ملف دفتر الشروط أولاً");
-        
-        const b = document.getElementById('b');
-        const s = document.getElementById('s');
-        const bt = document.getElementById('bt');
-        const res = document.getElementById('hb-result');
+    function runFakeAnalysis() {
+        const btn = document.getElementById('action-btn');
+        const loader = document.getElementById('loading-text');
+        const result = document.getElementById('analysis-result');
 
-        b.disabled = true;
-        s.style.display = 'inline-block';
-        bt.innerText = "جاري معالجة البيانات...";
-        res.style.display = 'none';
+        if(!document.getElementById('file-input').files[0]) {
+            alert("من فضلك ارفع ملف أولاً");
+            return;
+        }
 
-        // محاكاة "تفكير" الذكاء الاصطناعي لمدة 3 ثوانٍ
+        // إخفاء الزر وإظهار كلمة جاري التحليل
+        btn.style.display = 'none';
+        loader.style.display = 'block';
+
+        // بعد ثانيتين فقط، أظهر النتيجة
         setTimeout(() => {
-            b.disabled = false;
-            s.style.display = 'none';
-            bt.innerText = "تم التحليل بنجاح ✅";
-            res.style.display = 'block';
-        }, 3000);
+            loader.style.display = 'none';
+            result.style.display = 'block';
+        }, 2000);
     }
 </script>
 
