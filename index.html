@@ -2,56 +2,85 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>HeBuildz MVP Demo</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
-        :root { --hb-dark: #1e293b; --hb-orange: #f59e0b; }
-        body { font-family: 'Cairo', sans-serif; margin: 0; padding: 15px; background: #fff; color: #334155; }
-        .card { border: 1px solid #e2e8f0; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        .tabs { display: flex; background: #f1f5f9; padding: 5px; border-radius: 12px; margin-bottom: 20px; }
-        .tab { flex: 1; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; background: transparent; color: #64748b; font-family: 'Cairo'; }
-        .tab.active { background: var(--hb-dark); color: white; }
-        .upload { border: 2px dashed #cbd5e1; padding: 40px; text-align: center; border-radius: 15px; margin-bottom: 20px; background: #fafafa; cursor: pointer; }
-        .btn { width: 100%; padding: 16px; background: var(--hb-dark); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn:hover { background: #000; }
-        #report { display: none; margin-top: 25px; padding: 20px; background: #fffcf5; border-right: 5px solid var(--hb-orange); border-radius: 12px; border: 1px solid #ffedd5; }
-        .loader { width: 20px; height: 20px; border: 3px solid #ffffff3d; border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; display: none; margin-left: 10px; }
+        body { font-family: 'Cairo', sans-serif; background: transparent; padding: 10px; }
+        .hb-card { background: #fff; border-radius: 20px; padding: 20px; border: 1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .hb-tabs { display: flex; background: #f1f5f9; border-radius: 12px; padding: 5px; margin-bottom: 20px; }
+        .hb-tab { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: #64748b; background: transparent; font-family: 'Cairo'; }
+        .hb-tab.active { background: #1e293b; color: white; }
+        .hb-upload { border: 2px dashed #f59e0b; background: #fffcf5; padding: 30px; text-align: center; border-radius: 15px; cursor: pointer; margin-bottom: 20px; }
+        .hb-btn { width: 100%; padding: 15px; background: #1e293b; color: white; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .hb-btn:disabled { background: #94a3b8; }
+        .spinner { width: 18px; height: 18px; border: 3px solid #ffffff3d; border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #hb-result { display: none; margin-top: 20px; padding: 15px; background: #f0fdf4; border-right: 5px solid #22c55e; border-radius: 8px; animation: slideUp 0.5s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <div class="tabs">
-        <button class="tab active">تدقيق الاستشارة</button>
-        <button class="tab">تحليل دفتر الشروط</button>
+<div class="hb-card">
+    <div class="hb-tabs">
+        <button id="tab1" class="hb-tab active" onclick="chMode(1)">تدقيق الاستشارة</button>
+        <button id="tab2" class="hb-tab" onclick="chMode(2)">تحليل دفتر الشروط</button>
     </div>
 
-    <div class="upload" onclick="document.getElementById('fileIn').click()">
-        <input type="file" id="fileIn" style="display:none">
-        <div style="font-size: 40px;">📄</div>
-        <div id="fileTxt" style="font-weight: bold; margin-top:10px;">ارفع دفتر الشروط المعني</div>
+    <div class="hb-upload" onclick="document.getElementById('f').click()">
+        <input type="file" id="f" style="display:none">
+        <div style="font-size: 30px;">📄</div>
+        <div id="ft" style="font-weight: bold; color: #1e293b;">{اسم الملف سيظهر هنا}</div>
+        <div style="font-size: 11px; color: #64748b;">نظام HeBuildz جاهز للتحليل الاستراتيجي</div>
     </div>
 
-    <button id="runBtn" class="btn" onclick="startFakeAnalysis()">
-        <span class="loader" id="ld"></span>
-        <span id="btnTxt">بدء التحليل الاستراتيجي ⚡</span>
+    <button id="b" class="hb-btn" onclick="startDemo()">
+        <span class="spinner" id="s"></span>
+        <span id="bt">بدء التحليل الاستراتيجي ⚡</span>
     </button>
 
-    <div id="report">
-        <h3 style="color: #9a3412; margin-top: 0;">📊 ملخص تقرير HeBuildz الذكي:</h3>
-        <div style="font-size: 14px; line-height: 1.8;">
-            <strong>1. طبيعة المشروع:</strong> إنجاز مدرسة ابتدائية صنف (D) - ولاية الأغواط.<br>
-            <strong>2. أهم الالتزامات التقنية:</strong> <br>
-            • مدة الإنجاز المحددة بـ 08 أشهر (غير قابلة للتمديد).<br>
-            • إلزامية تقديم شهادة التأهيل والتدقيق المهني (درجة 04 فما فوق).<br>
-            <strong>3. مخاطر قانونية مكتشفة:</strong> <br>
-            • المادة 14 تحتوي على بند جزائي يتجاوز 10% من قيمة الصفقة (مخالف لقانون الصفقات 15/247).<br>
-            <strong>4. التوصية الاستراتيجية:</strong> المشروع مربح تقنياً، لكن يجب التفاوض على بند الغرامات المالية.
+    <div id="hb-result">
+        <h4 style="margin: 0 0 10px 0; color: #166534;">✅ تم استخراج التقرير الذكي:</h4>
+        <div style="font-size: 13px; line-height: 1.6; color: #1e293b;">
+            <b>• الوثيقة:</b> دفتر شروط اقتناء العجلات والبطاريات.<br>
+            <b>• التحليل التقني:</b> المواصفات المطلوبة مطابقة للمعايير الوطنية (الجزائر).<br>
+            <b>• ملاحظة هامة:</b> البند رقم 07 يفرض آجال تسليم قصيرة جداً (15 يوماً)، ينصح بمراجعة قدرة المخزون قبل التعهد.<br>
+            <b>• التقييم القانوني:</b> الوثيقة سليمة وتتوافق مع قانون الصفقات العمومية الحالي.
         </div>
     </div>
 </div>
 
 <script>
-    const fileIn = document.getElementById('fileIn');
-    fileIn.onchange = ()
+    const f = document.getElementById('f');
+    const ft = document.getElementById('ft');
+    f.onchange = () => { if(f.files[0]) ft.innerText = "✅ " + f.files[0].name; };
+
+    function chMode(n) {
+        document.getElementById('tab1').className = n===1 ? 'hb-tab active' : 'hb-tab';
+        document.getElementById('tab2').className = n===2 ? 'hb-tab active' : 'hb-tab';
+    }
+
+    function startDemo() {
+        if(!f.files[0]) return alert("يرجى رفع ملف دفتر الشروط أولاً");
+        
+        const b = document.getElementById('b');
+        const s = document.getElementById('s');
+        const bt = document.getElementById('bt');
+        const res = document.getElementById('hb-result');
+
+        b.disabled = true;
+        s.style.display = 'inline-block';
+        bt.innerText = "جاري معالجة البيانات...";
+        res.style.display = 'none';
+
+        // محاكاة "تفكير" الذكاء الاصطناعي لمدة 3 ثوانٍ
+        setTimeout(() => {
+            b.disabled = false;
+            s.style.display = 'none';
+            bt.innerText = "تم التحليل بنجاح ✅";
+            res.style.display = 'block';
+        }, 3000);
+    }
+</script>
+
+</body>
+</html>
