@@ -3,35 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HeBuildz AI Analyzer</title>
+    <title>HeBuildz Analyzer</title>
     <style>
-        body { font-family: 'Arial', sans-serif; background-color: #f8f9fa; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .app-card { background: white; width: 100%; max-width: 500px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; border: 1px solid #e0e0e0; }
-        .header { background: #2C3E50; color: white; padding: 20px; text-align: center; }
-        .header h2 span { color: #FF5722; }
-        .content { padding: 30px; text-align: center; }
-        .drop-zone { border: 2px dashed #FF5722; padding: 40px; border-radius: 10px; color: #7f8c8d; margin-bottom: 20px; cursor: pointer; transition: 0.3s; }
-        .drop-zone:hover { background: #fff5f2; }
-        .btn-analyze { background: #FF5722; color: white; border: none; padding: 15px 30px; border-radius: 8px; width: 100%; font-size: 18px; cursor: pointer; font-weight: bold; }
-        .status-bar { background: #ecf0f1; padding: 10px; font-size: 12px; color: #7f8c8d; text-align: center; border-top: 1px solid #ddd; }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #fdfdfd; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .app-container { width: 100%; max-width: 600px; background: white; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; border: 1px solid #eee; }
+        .app-header { background: #2c3e50; color: white; padding: 25px; text-align: center; }
+        .app-header h1 { margin: 0; font-size: 24px; }
+        .app-header h1 span { color: #ff5722; }
+        .content { padding: 40px; text-align: center; }
+        .upload-area { border: 3px dashed #ff5722; padding: 50px 20px; border-radius: 15px; background: #fff9f7; cursor: pointer; transition: 0.3s; margin-bottom: 25px; }
+        .upload-area:hover { background: #fff0eb; border-color: #e64a19; }
+        .upload-icon { font-size: 50px; margin-bottom: 15px; display: block; }
+        .btn-analyze { background: #ff5722; color: white; border: none; padding: 18px 40px; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; }
+        .btn-analyze:hover { background: #e64a19; transform: translateY(-2px); }
+        .footer-info { background: #f8f9fa; padding: 15px; font-size: 13px; color: #7f8c8d; border-top: 1px solid #eee; }
     </style>
 </head>
 <body>
-    <div class="app-card">
-        <div class="header">
-            <h2>He<span>Buildz</span> AI</h2>
+    <div class="app-container">
+        <div class="app-header">
+            <h1>He<span>Buildz</span> AI Analyzer</h1>
         </div>
         <div class="content">
-            <h3>محلل الصفقات العمومية</h3>
-            <p>ارفع ملف المناقصة أو جدول الأسعار للتحليل</p>
-            <div class="drop-zone" onclick="alert('جاري تفعيل خاصية الرفع...')">
-                <span>📁 اضغط هنا لرفع الملفات (PDF/JPG)</span>
+            <span class="upload-icon">📄</span>
+            <h3>محلل العروض والصفقات العمومية</h3>
+            <p style="color: #666;">ارفع ملف دفتر الشروط أو جدول الأسعار بصيغة (PDF/JPG)</p>
+            <div class="upload-area" onclick="document.getElementById('file-upload').click()">
+                <p id="file-name">اسحب الملف هنا أو انقر لاختياره</p>
+                <input type="file" id="file-upload" style="display: none;" onchange="updateFileName()">
             </div>
-            <button class="btn-analyze">بدء تحليل الأهلية والأسعار</button>
+            <button class="btn-analyze" onclick="startAnalysis()">بدء التحليل الذكي</button>
         </div>
-        <div class="status-bar">
-            v1.0 MVP | متصل بمحرك Gemini 1.5 Pro
+        <div class="footer-info">
+            المنصة تدعم تحليل المواد القانونية والتقدير المالي وفق المرسوم 15-247
         </div>
     </div>
+
+    <script>
+        function updateFileName() {
+            const input = document.getElementById('file-upload');
+            const nameDisplay = document.getElementById('file-name');
+            if (input.files.length > 0) {
+                nameDisplay.innerText = "تم اختيار: " + input.files[0].name;
+                nameDisplay.style.color = "#27ae60";
+                nameDisplay.style.fontWeight = "bold";
+            }
+        }
+        function startAnalysis() {
+            alert("جاري الاتصال بمحرك HeBuildz AI... يرجى الانتظار");
+        }
+    </script>
 </body>
 </html>
