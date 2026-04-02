@@ -2,110 +2,56 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HeBuildz AI Studio</title>
+    <title>HeBuildz MVP Demo</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
-        :root { --hb-dark: #1e293b; --hb-orange: #f59e0b; --hb-text: #334155; }
-        body { font-family: 'Cairo', sans-serif; margin: 0; padding: 10px; background: transparent; color: var(--hb-text); }
-        .main-card { background: white; border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); padding: 25px; border: 1px solid #e2e8f0; }
-        .tabs { display: flex; background: #f1f5f9; padding: 4px; border-radius: 10px; margin-bottom: 20px; }
-        .tab { flex: 1; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-family: 'Cairo'; color: #64748b; background: transparent; transition: 0.3s; }
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+        :root { --hb-dark: #1e293b; --hb-orange: #f59e0b; }
+        body { font-family: 'Cairo', sans-serif; margin: 0; padding: 15px; background: #fff; color: #334155; }
+        .card { border: 1px solid #e2e8f0; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .tabs { display: flex; background: #f1f5f9; padding: 5px; border-radius: 12px; margin-bottom: 20px; }
+        .tab { flex: 1; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; background: transparent; color: #64748b; font-family: 'Cairo'; }
         .tab.active { background: var(--hb-dark); color: white; }
-        .upload-zone { border: 2px dashed #cbd5e1; border-radius: 12px; padding: 35px 15px; text-align: center; margin-bottom: 20px; cursor: pointer; background: #fafafa; transition: 0.3s; }
-        .upload-zone:hover { border-color: var(--hb-orange); background: #fffcf5; }
-        .btn-analyze { width: 100%; padding: 15px; background: var(--hb-orange); color: white; border: none; border-radius: 10px; font-size: 17px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-analyze:disabled { background: #cbd5e1; cursor: not-allowed; }
-        #res-box { display: none; margin-top: 20px; padding: 15px; background: #f8fafc; border-right: 4px solid var(--hb-dark); border-radius: 8px; }
-        .loader { width: 18px; height: 18px; border: 3px solid #ffffff3d; border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; display: none; }
+        .upload { border: 2px dashed #cbd5e1; padding: 40px; text-align: center; border-radius: 15px; margin-bottom: 20px; background: #fafafa; cursor: pointer; }
+        .btn { width: 100%; padding: 16px; background: var(--hb-dark); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn:hover { background: #000; }
+        #report { display: none; margin-top: 25px; padding: 20px; background: #fffcf5; border-right: 5px solid var(--hb-orange); border-radius: 12px; border: 1px solid #ffedd5; }
+        .loader { width: 20px; height: 20px; border: 3px solid #ffffff3d; border-top: 3px solid white; border-radius: 50%; animation: spin 1s linear infinite; display: none; margin-left: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div class="main-card">
+<div class="card">
     <div class="tabs">
-        <button id="t1" class="tab active" onclick="setMode('consultation')">تدقيق الاستشارة</button>
-        <button id="t2" class="tab" onclick="setMode('cahier')">تحليل دفتر الشروط</button>
+        <button class="tab active">تدقيق الاستشارة</button>
+        <button class="tab">تحليل دفتر الشروط</button>
     </div>
 
-    <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
-        <input type="file" id="fileInput" style="display:none" accept="image/*,application/pdf">
-        <div style="font-size: 30px; margin-bottom: 10px;">📄</div>
-        <div id="statusText" style="font-weight: 600;">اسحب ملف المناقصة هنا</div>
-        <div style="font-size: 11px; color: #94a3b8; margin-top: 5px;">نظام HeBuildz يدعم حتى 4 ميجابايت</div>
+    <div class="upload" onclick="document.getElementById('fileIn').click()">
+        <input type="file" id="fileIn" style="display:none">
+        <div style="font-size: 40px;">📄</div>
+        <div id="fileTxt" style="font-weight: bold; margin-top:10px;">ارفع دفتر الشروط المعني</div>
     </div>
 
-    <button id="execBtn" class="btn-analyze" onclick="runHeBuildzAI()">
-        <span class="loader" id="loadingIcon"></span>
-        <span id="btnText">بدء التحليل الذكي</span>
+    <button id="runBtn" class="btn" onclick="startFakeAnalysis()">
+        <span class="loader" id="ld"></span>
+        <span id="btnTxt">بدء التحليل الاستراتيجي ⚡</span>
     </button>
 
-    <div id="res-box">
-        <strong style="color: var(--hb-dark); display: block; margin-bottom: 8px;">نتائج التحليل من Gemini API:</strong>
-        <div id="ai-output" style="white-space: pre-wrap; font-size: 13px; line-height: 1.6;"></div>
+    <div id="report">
+        <h3 style="color: #9a3412; margin-top: 0;">📊 ملخص تقرير HeBuildz الذكي:</h3>
+        <div style="font-size: 14px; line-height: 1.8;">
+            <strong>1. طبيعة المشروع:</strong> إنجاز مدرسة ابتدائية صنف (D) - ولاية الأغواط.<br>
+            <strong>2. أهم الالتزامات التقنية:</strong> <br>
+            • مدة الإنجاز المحددة بـ 08 أشهر (غير قابلة للتمديد).<br>
+            • إلزامية تقديم شهادة التأهيل والتدقيق المهني (درجة 04 فما فوق).<br>
+            <strong>3. مخاطر قانونية مكتشفة:</strong> <br>
+            • المادة 14 تحتوي على بند جزائي يتجاوز 10% من قيمة الصفقة (مخالف لقانون الصفقات 15/247).<br>
+            <strong>4. التوصية الاستراتيجية:</strong> المشروع مربح تقنياً، لكن يجب التفاوض على بند الغرامات المالية.
+        </div>
     </div>
 </div>
 
 <script>
-    let currentMode = 'consultation';
-    const fIn = document.getElementById('fileInput');
-    
-    fIn.onchange = () => { if(fIn.files[0]) document.getElementById('statusText').innerText = "✅ " + fIn.files[0].name; };
-
-    function setMode(m) {
-        currentMode = m;
-        document.getElementById('t1').className = m === 'consultation' ? 'tab active' : 'tab';
-        document.getElementById('t2').className = m === 'cahier' ? 'tab active' : 'tab';
-    }
-
-    async function runHeBuildzAI() {
-        const file = fIn.files[0];
-        if(!file) return alert("يرجى رفع ملف أولاً");
-
-        const btn = document.getElementById('execBtn');
-        const ld = document.getElementById('loadingIcon');
-        const txt = document.getElementById('btnText');
-        
-        btn.disabled = true;
-        ld.style.display = 'inline-block';
-        txt.innerText = "جاري المعالجة المعمقة...";
-
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            const base64 = reader.result.split(',')[1];
-            // تم وضع مفتاحك الجديد هنا
-            const API_KEY = "AIzaSyBHlb39mDzSBvwc4u_uCfTUbYKfL1Bb2TQ"; 
-            
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        contents: [{ parts: [
-                            { text: currentMode === 'consultation' ? "حلل هذه الاستشارة الجزائرية واستخرج النقاط القانونية والوثائق المطلوبة" : "حلل دفتر الشروط هذا واستخرج الالتزامات المالية والتقنية" },
-                            { inline_data: { mime_type: file.type, data: base64 } }
-                        ]}]
-                    })
-                });
-
-                const data = await response.json();
-                if(data.candidates && data.candidates[0]) {
-                    document.getElementById('ai-output').innerText = data.candidates[0].content.parts[0].text;
-                    document.getElementById('res-box').style.display = 'block';
-                } else {
-                    alert("المحرك لم يتمكن من تحليل هذا النوع من الملفات. تأكد من وضوح الصورة.");
-                }
-            } catch (err) {
-                alert("خطأ في الاتصال بالخادم. يرجى المحاولة لاحقاً.");
-            } finally {
-                btn.disabled = false;
-                ld.style.display = 'none';
-                txt.innerText = "بدء التحليل الذكي";
-            }
-        };
-        reader.readAsDataURL(file); // تم إصلاح الدالة هنا
-    }
-</script>
-</body>
-</html>
+    const fileIn = document.getElementById('fileIn');
+    fileIn.onchange = ()
