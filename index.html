@@ -3,59 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HeBuildz AI Analyzer</title>
+    <title>HeBuildz - AI Smart Analyzer</title>
     <style>
         body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f7f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .app-card { width: 95%; max-width: 550px; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
-        .header { background: #2c3e50; color: white; padding: 20px; text-align: center; border-bottom: 4px solid #ff5722; }
-        .content { padding: 30px; text-align: center; }
-        .upload-box { border: 2px dashed #ff5722; padding: 40px 20px; border-radius: 12px; background: #fff9f7; cursor: pointer; margin-bottom: 20px; position: relative; }
-        .upload-box:hover { background: #fff0eb; }
+        .app-card { width: 95%; max-width: 550px; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; border: 1px solid #ddd; }
+        .header { background: #2c3e50; color: white; padding: 20px; text-align: center; border-bottom: 5px solid #ff5722; }
+        .content { padding: 30px; }
+        .upload-box { border: 2px dashed #ff5722; padding: 40px; border-radius: 12px; background: #fff9f7; cursor: pointer; text-align: center; margin-bottom: 20px; }
         .btn-analyze { background: #ff5722; color: white; border: none; padding: 15px; border-radius: 8px; width: 100%; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .btn-analyze:disabled { background: #bdc3c7; cursor: not-allowed; }
-        #result-area { margin-top: 20px; padding: 15px; border-radius: 8px; background: #e8f4fd; display: none; text-align: right; font-size: 0.9rem; }
-        .loading-dots:after { content: ' .'; animation: dots 1s steps(5, end) infinite; }
-        @keyframes dots { 20% { content: ' .'; } 40% { content: ' ..'; } 60% { content: ' ...'; } 80% { content: ' ....'; } }
+        
+        /* منطقة النتائج */
+        #analysis-result { margin-top: 20px; display: none; padding: 20px; border-radius: 10px; background: #f8f9fa; border-right: 5px solid #27ae60; animation: fadeIn 0.5s; }
+        .progress-bar { height: 10px; background: #eee; border-radius: 5px; margin: 15px 0; display: none; overflow: hidden; }
+        .progress-fill { height: 100%; background: #ff5722; width: 0%; transition: width 3s linear; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
     <div class="app-card">
-        <div class="header"><h2>He<span>Buildz</span> AI Analyzer</h2></div>
+        <div class="header"><h2>He<span>Buildz</span> AI</h2></div>
         <div class="content">
-            <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-                <span id="upload-text" style="font-size: 1.2rem; color: #7f8c8d;">📁 انقر لرفع ملف (PDF/BPU)</span>
-                <input type="file" id="fileInput" style="display: none" onchange="handleFile(this)">
+            <div class="upload-box" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                <span id="status-text" style="font-size: 1.1rem; color: #7f8c8d;">📂 انقر لرفع ملف المناقصة (BPU/PDF)</span>
+                <input type="file" id="fileInput" style="display: none" onchange="fileSelected(this)">
             </div>
-            <button id="analyzeBtn" class="btn-analyze" disabled onclick="runAI()">بدء التحليل الاستراتيجي</button>
-            <div id="result-area"></div>
+
+            <button id="startBtn" class="btn-analyze" disabled onclick="simulateAnalysis()">بدء التحليل الاستراتيجي</button>
+
+            <div class="progress-bar" id="pBar"><div class="progress-fill" id="pFill"></div></div>
+
+            <div id="analysis-result">
+                <h4 style="margin:0 0 10px 0; color: #2c3e50;">📊 نتائج تقرير HeBuildz:</h4>
+                <p id="result-text" style="line-height: 1.6; font-size: 0.95rem; color: #444;"></p>
+            </div>
         </div>
     </div>
 
     <script>
-        function handleFile(input) {
-            const text = document.getElementById('upload-text');
-            const btn = document.getElementById('analyzeBtn');
+        function fileSelected(input) {
             if (input.files.length > 0) {
-                text.innerText = "✅ تم تحميل: " + input.files[0].name;
-                text.style.color = "#27ae60";
-                btn.disabled = false;
+                document.getElementById('status-text').innerHTML = "✅ تم تحميل: <b>" + input.files[0].name + "</b>";
+                document.getElementById('status-text').style.color = "#27ae60";
+                document.getElementById('startBtn').disabled = false;
             }
         }
 
-        function runAI() {
-            const btn = document.getElementById('analyzeBtn');
-            const res = document.getElementById('result-area');
-            btn.disabled = true;
-            btn.innerText = "جاري التحليل عبر الذكاء الاصطناعي";
-            btn.classList.add('loading-dots');
-            res.style.display = 'block';
-            res.innerHTML = "<b>جاري الفحص...</b><br>• التدقيق في مطابقة المادة 67 من قانون الصفقات...<br>• تحليل هوامش الربح في جدول الأسعار...";
+        function simulateAnalysis() {
+            const btn = document.getElementById('startBtn');
+            const pBar = document.getElementById('pBar');
+            const pFill = document.getElementById('pFill');
+            const result = document.getElementById('analysis-result');
+            const resText = document.getElementById('result-text');
 
+            btn.disabled = true;
+            btn.innerText = "جاري الفحص المتقدم...";
+            pBar.style.display = 'block';
+            
+            // تحريك شريط التقدم
+            setTimeout(() => { pFill.style.width = '100%'; }, 100);
+
+            // إظهار النتيجة بعد 3 ثوانٍ
             setTimeout(() => {
-                btn.classList.remove('loading-dots');
-                btn.innerText = "تم التحليل بنجاح";
-                res.innerHTML = "<b style='color:#2c3e50'>نتائج تحليل HeBuildz:</b><br>✅ الملف مطابق إدارياً للمناقصة.<br>⚠️ تنبيه: السعر في البند رقم 4 منخفض بنسبة 15% عن سعر السوق الحالي.<br>💡 توصية: يرجى مراجعة عرض السعر لتجنب الإقصاء بسبب 'العرض المالي غير المجدي'.";
-            }, 3000);
+                pBar.style.display = 'none';
+                btn.innerText = "اكتمل التحليل ✅";
+                result.style.display = 'block';
+                resText.innerHTML = `
+                    • <b>الأهلية القانونية:</b> الملف مطابق للمرسوم 15-247.<br>
+                    • <b>التقدير المالي:</b> تم رصد مخاطر في "البند 04" (أشغال الحفر) - السعر أقل من المعدل الوطني بـ 12%.<br>
+                    • <b>التوصية:</b> يوصى برفع السعر الوحدوي لتجنب إقصاء العرض كـ "عرض غير مجدي".
+                `;
+            }, 3200);
         }
     </script>
 </body>
