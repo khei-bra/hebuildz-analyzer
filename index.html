@@ -3,60 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HeBuildz AI Studio Prototype</title>
-    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <title>HeBuildz Core Engine</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
-
-        function App() {
-            // انسخ هنا المنطق (Logic) الخاص بـ App.tsx الذي ولده لك Google AI Studio
-            // سأضع لك مثالاً للهيكل الذي يولده AI Studio عادةً:
-            
-            const [loading, setLoading] = useState(false);
-            const [result, setResult] = useState(null);
-
-            const handleAnalyze = () => {
-                setLoading(true);
-                // هنا يتم استدعاء Gemini API (تأكد من وضع API Key الخاص بك)
-                setTimeout(() => {
-                    setResult("نتائج التحليل من Gemini API...");
-                    setLoading(false);
-                }, 2000);
-            };
-
+        // 1. هنا نضع محتويات ملف App.tsx الذي نسخه من AI Studio
+        // (تأكد من إزالة سطر import React و Lucide لأننا حملناها أعلاه)
+        
+        const App = () => {
+            // انسخ المنطق (Logic) والـ HTML الخاص بـ App هنا
             return (
-                <div className="p-8 bg-gray-50 min-h-screen">
-                    <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
-                        <h1 className="text-2xl font-bold text-gray-800 mb-4">HeBuildz - AI Studio Engine</h1>
-                        <p className="text-gray-600 mb-6">هذا النموذج يعمل بمحرك Gemini 1.5 Pro</p>
-                        
-                        <div className="border-2 border-dashed border-orange-500 p-10 text-center rounded-lg cursor-pointer hover:bg-orange-50">
-                             اسحب ملف المناقصة هنا
-                        </div>
-                        
-                        <button 
-                            onClick={handleAnalyze}
-                            className="w-full mt-6 bg-orange-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-700"
-                        >
-                            {loading ? 'جاري التحليل...' : 'بدء التحليل الذكي'}
-                        </button>
-
-                        {result && (
-                            <div className="mt-6 p-4 bg-blue-50 border-r-4 border-blue-500 text-right">
-                                {result}
-                            </div>
-                        )}
-                    </div>
+                <div className="min-h-screen bg-slate-50 p-4">
+                    {/* كود الواجهة الخاص بك هنا */}
                 </div>
             );
-        }
+        };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
