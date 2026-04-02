@@ -1,81 +1,211 @@
-<div id="hb-analyzer-container" style="direction: rtl; font-family: sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 15px; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-    
-    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <button id="btn-1" onclick="switchMode('one')" style="flex: 1; padding: 10px; cursor: pointer; border-radius: 8 baseline; border: none; background: #1e293b; color: white; font-weight: bold;">📄 تدقيق الاستشارة</button>
-        <button id="btn-2" onclick="switchMode('two')" style="flex: 1; padding: 10px; cursor: pointer; border-radius: 8px; border: none; background: #f1f5f9; color: #64748b; font-weight: bold;">🛡️ دفتر الشروط</button>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeBuildz AI Engine</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+        
+        :root {
+            --hb-dark: #1e293b;
+            --hb-orange: #f59e0b;
+            --hb-bg: #f8fafc;
+            --hb-text: #334155;
+        }
+
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            margin: 0; 
+            padding: 15px; 
+            background: transparent; 
+            color: var(--hb-text);
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .tabs-container {
+            display: flex;
+            background: #f1f5f9;
+            padding: 5px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-family: 'Cairo';
+            transition: all 0.3s ease;
+            color: #64748b;
+            background: transparent;
+        }
+
+        .tab-btn.active {
+            background: var(--hb-dark);
+            color: white;
+            box-shadow: 0 4px 12px rgba(30, 41, 59, 0.2);
+        }
+
+        .upload-box {
+            border: 2px dashed #cbd5e1;
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            background: #fafafa;
+        }
+
+        .upload-box:hover {
+            border-color: var(--hb-orange);
+            background: #fffcf5;
+        }
+
+        .upload-icon { font-size: 40px; margin-bottom: 10px; display: block; }
+
+        .analyze-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--hb-dark);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+
+        .analyze-btn:hover { background: #000; transform: translateY(-2px); }
+        .analyze-btn:disabled { background: #cbd5e1; cursor: not-allowed; transform: none; }
+
+        #result-area {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            background: #fffcf5;
+            border-right: 5px solid var(--hb-orange);
+            border-radius: 12px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .loader {
+            width: 20px; height: 20px;
+            border: 3px solid #ffffff3d;
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="main-card">
+    <div class="tabs-container">
+        <button id="tab1" class="tab-btn active" onclick="switchMode('consultation')">تدقيق الاستشارة</button>
+        <button id="tab2" class="tab-btn" onclick="switchMode('cahier')">تحليل دفتر الشروط</button>
     </div>
 
-    <div style="border: 2px dashed #ccc; padding: 30px; text-align: center; border-radius: 10px; margin-bottom: 20px; background: #fafafa; position: relative;">
-        <input type="file" id="fileInput" style="position: absolute; inset: 0; opacity: 0; cursor: pointer;" accept="image/*,application/pdf">
-        <div id="fileName" style="color: #666; font-weight: bold;">اضغط لرفع ملف (صورة أو PDF)</div>
+    <div class="upload-box" onclick="document.getElementById('fileIn').click()">
+        <input type="file" id="fileIn" style="display:none" accept="image/*,application/pdf">
+        <span class="upload-icon">☁️</span>
+        <div id="fileText" style="font-weight: 600;">ارفع الوثيقة (صورة أو PDF)</div>
+        <div style="font-size: 12px; color: #94a3b8; mt-2">نظام HeBuildz يدعم حتى 4 ميجابايت</div>
     </div>
 
-    <button id="analyzeBtn" onclick="processAnalysis()" style="width: 100%; padding: 15px; background: #2c3e50; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer;">بدء التحليل الاستراتيجي ⚡</button>
+    <button id="mainBtn" class="analyze-btn" onclick="startAI()">
+        <span class="loader" id="ld"></span>
+        <span id="btnTxt">بدء التحليل الاستراتيجي ⚡</span>
+    </button>
 
-    <div id="loading" style="display: none; text-align: center; margin-top: 15px; color: #f59e0b; font-weight: bold;">جاري التحليل... يرجى الانتظار</div>
-    <div id="errorArea" style="display: none; margin-top: 15px; padding: 10px; background: #fee2e2; color: #b91c1c; border-right: 5px solid red; font-size: 14px;"></div>
-    <div id="resultArea" style="display: none; margin-top: 20px; padding: 15px; background: #fffcf5; border-right: 5px solid #f59e0b; border-radius: 8px;">
-        <h4 style="margin: 0 0 10px 0; color: #9a3412;">نتائج التحليل:</h4>
-        <div id="textContent" style="white-space: pre-wrap; font-size: 14px; line-height: 1.6; color: #334155;"></div>
+    <div id="result-area">
+        <h4 style="margin: 0 0 15px 0; color: #9a3412; display: flex; align-items: center; gap: 8px;">
+            <span>✅</span> تقرير HeBuildz للذكاء الاصطناعي:
+        </h4>
+        <div id="ai-text" style="white-space: pre-wrap; font-size: 14px; line-height: 1.8; color: var(--hb-text);"></div>
     </div>
 </div>
 
 <script>
-    let currentMode = 'one';
-    const fileInput = document.getElementById('fileInput');
-    const fileNameDiv = document.getElementById('fileName');
+    let mode = 'consultation';
+    const fileIn = document.getElementById('fileIn');
+    
+    fileIn.onchange = () => {
+        if(fileIn.files[0]) document.getElementById('fileText').innerText = "✅ " + fileIn.files[0].name;
+    };
 
-    fileInput.addEventListener('change', (e) => {
-        if(e.target.files[0]) fileNameDiv.innerText = "✅ " + e.target.files[0].name;
-    });
-
-    function switchMode(mode) {
-        currentMode = mode;
-        document.getElementById('btn-1').style.background = (mode === 'one') ? '#1e293b' : '#f1f5f9';
-        document.getElementById('btn-1').style.color = (mode === 'one') ? 'white' : '#64748b';
-        document.getElementById('btn-2').style.background = (mode === 'two') ? '#f59e0b' : '#f1f5f9';
-        document.getElementById('btn-2').style.color = (mode === 'two') ? 'white' : '#64748b';
+    function switchMode(m) {
+        mode = m;
+        document.getElementById('tab1').className = m === 'consultation' ? 'tab-btn active' : 'tab-btn';
+        document.getElementById('tab2').className = m === 'cahier' ? 'tab-btn active' : 'tab-btn';
+        document.getElementById('result-area').style.display = 'none';
     }
 
-    async function processAnalysis() {
-        const file = fileInput.files[0];
+    async function startAI() {
+        const file = fileIn.files[0];
         if(!file) return alert("يرجى اختيار ملف أولاً");
 
-        document.getElementById('analyzeBtn').disabled = true;
-        document.getElementById('loading').style.display = 'block';
-        document.getElementById('resultArea').style.display = 'none';
-        document.getElementById('errorArea').style.display = 'none';
+        const btn = document.getElementById('mainBtn');
+        const loader = document.getElementById('ld');
+        const txt = document.getElementById('btnTxt');
+        
+        btn.disabled = true;
+        loader.style.display = 'inline-block';
+        txt.innerText = "جاري المعالجة المعمقة...";
 
         const reader = new FileReader();
         reader.onloadend = async () => {
-            const base64Data = reader.result.split(',')[1];
-            const API_KEY = "AIzaSyDImR8D0ilVbSdb9Y-7k4qAt2N_OdIyl84";
-            const prompt = (currentMode === 'one') ? "حلل هذه الاستشارة واستخرج البيانات" : "حلل دفتر الشروط بالتفصيل";
-
+            const base64 = reader.result.split(',')[1];
+            const KEY = "AIzaSyDImR8D0ilVbSdb9Y-7k4qAt2N_OdIyl84"; // مفتاحك الفعال
+            
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${KEY}`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: file.type, data: base64Data } }] }]
+                        contents: [{ parts: [
+                            { text: mode === 'consultation' ? "حلل هذه الاستشارة الجزائرية واستخرج النقاط القانونية" : "حلل دفتر الشروط واستخرج الالتزامات" },
+                            { inline_data: { mime_type: file.type, data: base64 } }
+                        ]}]
                     })
                 });
 
                 const data = await response.json();
-                if(data.candidates) {
-                    document.getElementById('textContent').innerText = data.candidates[0].content.parts[0].text;
-                    document.getElementById('resultArea').style.display = 'block';
-                } else {
-                    throw new Error();
-                }
+                document.getElementById('ai-text').innerText = data.candidates[0].content.parts[0].text;
+                document.getElementById('result-area').style.display = 'block';
             } catch (err) {
-                document.getElementById('errorArea').innerText = "فشل التحليل. تأكد من الإنترنت أو حجم الملف.";
-                document.getElementById('errorArea').style.display = 'block';
+                alert("حدث خطأ في الاتصال، تأكد من حجم الملف.");
             } finally {
-                document.getElementById('analyzeBtn').disabled = false;
-                document.getElementById('loading').style.display = 'none';
+                btn.disabled = false;
+                loader.style.display = 'none';
+                txt.innerText = "بدء التحليل الاستراتيجي ⚡";
             }
         };
         reader.readAsDataURL(file);
     }
 </script>
+
+</body>
+</html>
