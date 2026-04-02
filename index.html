@@ -44,7 +44,6 @@
 
             const runAnalysis = async () => {
                 if (!file) return;
-                
                 setLoading(true);
                 setResult("");
                 setError("");
@@ -53,7 +52,8 @@
                 reader.onloadend = async () => {
                     try {
                         const base64Data = reader.result.split(',')[1];
-                        const API_KEY = "AIzaSyBHlb39mDzSBvwc4u_uCfTUbYKfL1Bb2TQ"; 
+                        // المفتاح الجديد الذي أرسلته
+                        const API_KEY = "AIzaSyDImR8D0ilVbSdb9Y-7k4qAt2N_OdIyl84"; 
                         
                         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
                             method: "POST",
@@ -61,7 +61,7 @@
                             body: JSON.stringify({
                                 contents: [{
                                     parts: [
-                                        { text: activeTab === 'consultation' ? "حلل هذه الوثيقة واستخرج طبيعة المشروع والوثائق المطلوبة." : "حلل دفتر الشروط واستخرج الالتزامات المالية." },
+                                        { text: activeTab === 'consultation' ? "حلل هذه الاستشارة الجزائرية واستخرج أهم النقاط القانونية." : "حلل دفتر الشروط واستخرج الالتزامات التقنية." },
                                         { inline_data: { mime_type: file.type, data: base64Data } }
                                     ]
                                 }]
@@ -70,70 +70,70 @@
 
                         const data = await response.json();
                         
-                        // فحص دقيق للاستجابة لمنع الـ Crash
-                        if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                        if (data.candidates && data.candidates[0]) {
                             setResult(data.candidates[0].content.parts[0].text);
                         } else if (data.error) {
-                            setError(`خطأ من المحرك: ${data.error.message}`);
+                            setError(`تنبيه: ${data.error.message}`);
                         } else {
-                            setError("لم يتمكن الذكاء الاصطناعي من قراءة الملف. حاول رفع صورة أوضح.");
+                            setError("حدث خطأ في قراءة رد المحرك الذكي.");
                         }
                     } catch (err) {
-                        setError("حدث خطأ أثناء الاتصال بالخادم. تأكد من الإنترنت.");
+                        setError("انقطع الاتصال بالمحرك. تأكد من حجم الملف أو جودة الإنترنت.");
                     } finally {
                         setLoading(false);
                     }
                 };
-                
-                reader.onerror = () => {
-                    setError("فشل قراءة الملف من جهازك.");
-                    setLoading(false);
-                };
-
                 reader.readAsDataURL(file);
             };
 
             return (
                 <div className="min-h-screen p-4">
                     <div className="max-w-3xl mx-auto">
-                        <div className="flex gap-2 p-1 bg-slate-200 rounded-xl w-fit mb-8 mx-auto shadow-sm">
-                            <button onClick={() => setActiveTab('consultation')}
-                                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all ${activeTab === 'consultation' ? 'bg-[#1e293b] text-white' : 'text-slate-600'}`}>
+                        <div className="flex gap-2 p-1 bg-slate-200 rounded-xl w-fit mb-8 mx-auto shadow-sm border border-slate-300">
+                            <button onClick={() => {setActiveTab('consultation'); setResult(""); setError("");}}
+                                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all ${activeTab === 'consultation' ? 'bg-[#1e293b] text-white shadow-md' : 'text-slate-600 hover:bg-slate-300'}`}>
                                 <i data-lucide="file-text"></i> تدقيق الاستشارة
                             </button>
-                            <button onClick={() => setActiveTab('cahier')}
-                                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all ${activeTab === 'cahier' ? 'bg-[#f59e0b] text-white' : 'text-slate-600'}`}>
+                            <button onClick={() => {setActiveTab('cahier'); setResult(""); setError("");}}
+                                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all ${activeTab === 'cahier' ? 'bg-[#f59e0b] text-white shadow-md' : 'text-slate-600 hover:bg-slate-300'}`}>
                                 <i data-lucide="shield"></i> تحليل دفتر الشروط
                             </button>
                         </div>
 
-                        <div className="bg-white rounded-2xl shadow-xl border p-8">
-                            <h2 className="text-2xl font-bold text-center mb-6">
-                                {activeTab === 'consultation' ? 'محلل الاستشارات' : 'مدقق دفاتر الشروط'}
+                        <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 p-8">
+                            <h2 className="text-2xl font-bold text-center mb-6 text-slate-800">
+                                {activeTab === 'consultation' ? 'محلل الاستشارات الذكي' : 'مدقق دفاتر الشروط المتقدم'}
                             </h2>
                             
-                            <div className="border-2 border-dashed border-slate-200 rounded-xl p-10 hover:border-orange-400 bg-slate-50 text-center relative mb-6">
+                            <div className="border-2 border-dashed border-slate-200 rounded-xl p-10 hover:border-orange-400 bg-slate-50 text-center relative mb-6 transition-colors">
                                 <input type="file" onChange={handleFileChange} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*,application/pdf" />
-                                <i data-lucide="upload-cloud" className="mx-auto mb-2 text-slate-400"></i>
-                                <p className="font-bold text-slate-700">{file ? file.name : "اضغط لرفع وثيقة (صورة أو PDF)"}</p>
+                                <div className="flex flex-col items-center">
+                                    <i data-lucide="upload-cloud" className="mb-2 text-slate-400 w-10 h-10"></i>
+                                    <p className="font-bold text-slate-700">{file ? file.name : "ارفع الوثيقة (صورة أو PDF)"}</p>
+                                    <p className="text-xs text-slate-400 mt-2">نظام HeBuildz يدعم الملفات حتى 4 ميجابايت</p>
+                                </div>
                             </div>
 
                             <button onClick={runAnalysis} disabled={loading || !file}
-                                className={`w-full py-4 rounded-xl font-bold text-lg flex justify-center items-center gap-3 transition-all ${loading || !file ? 'bg-slate-300' : 'bg-[#2c3e50] text-white hover:bg-[#1a252f]'}`}>
+                                className={`w-full py-4 rounded-xl font-bold text-lg flex justify-center items-center gap-3 transition-all ${loading || !file ? 'bg-slate-300 cursor-not-allowed' : 'bg-[#2c3e50] text-white hover:bg-[#1a252f] shadow-lg active:scale-95'}`}>
                                 {loading ? <div className="loader"></div> : <i data-lucide="zap" className="text-yellow-400"></i>}
-                                {loading ? "جاري التحليل..." : "بدء التحليل الآن"}
+                                {loading ? "جاري التحليل المعمق..." : "بدء التحليل الاستراتيجي"}
                             </button>
 
                             {error && (
-                                <div className="mt-6 p-4 bg-red-50 border-r-4 border-red-500 text-red-700 text-sm">
+                                <div className="mt-6 p-4 bg-red-50 border-r-4 border-red-500 text-red-700 rounded shadow-sm">
                                     {error}
                                 </div>
                             )}
 
                             {result && (
-                                <div className="mt-8 p-6 bg-orange-50 border-r-4 border-orange-500 rounded-lg text-right">
-                                    <p className="font-bold text-orange-800 mb-2">تقرير التحليل:</p>
-                                    <div className="text-slate-700 whitespace-pre-wrap leading-relaxed">{result}</div>
+                                <div className="mt-8 p-6 bg-orange-50 border-r-4 border-orange-500 rounded-lg text-right animate-in fade-in slide-in-from-top-4 duration-500">
+                                    <h3 className="font-bold text-orange-900 mb-3 flex items-center gap-2">
+                                        <i data-lucide="check-circle" className="w-5 h-5"></i> تقرير الذكاء الاصطناعي:
+                                    </h3>
+                                    <div className="text-slate-700 leading-relaxed whitespace-pre-wrap text-sm border-t border-orange-200 pt-4 mt-2">
+                                        {result}
+                                    </div>
                                 </div>
                             )}
                         </div>
